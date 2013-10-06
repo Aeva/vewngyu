@@ -1,4 +1,23 @@
+# compiled python for both 2 and 3
+*.py[cod]
+*__pycache__*
+
+# for setup stuff
+*.egg
+*.egg-info
+sdist
+build
+
+# for virtualenv's
+bin
+include
+lib
+lib64
+
+# Translations
+*.mo
+
+# other misc
 *.log
-*.pot
-*.pyc
+pip-log.txt
 local_settings.py
