@@ -7,7 +7,7 @@ Install and Run
 ---------------
 
 Currently ensure that you have python-virtualenv and then run the following command:
-`virtualenv . && . bin/activate && pip install django`
+`virtualenv . && . bin/activate && pip install -r pip-requirements`
 
 You should make a config file by running `make ~/.vewngyu` and then adding a config file
 in ~/.vewngyu/config.ini which contains at the minimum:
