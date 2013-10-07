@@ -1,6 +1,26 @@
-# Django settings for vewngyu project.
+import ConfigParser
+import os
 
-DEBUG = True
+# Default config is expected ~/.vewngyu/config.ini
+config_path = os.path.expanduser("~/.vewngyu/config.ini")
+config_path = os.path.expanduser(os.environ.get('VEWNGYU_CONFIG', config_path))
+
+if not os.path.exists(config_path):
+    raise Exception("No config file found {0!r}".format(config_path))
+
+# Parse config file
+parser = ConfigParser.SafeConfigParser()
+parser.read(config_path)
+
+# Build a dictionary of {"section:option": "value"}
+config = {}
+for section in parser.sections():
+    for option, value in parser.items(section):
+        config["{0}:{1}".format(section, option)] = value
+
+
+# Django settings for vewngyu project.
+DEBUG = config.get("vewngyu:debug", False)
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -11,13 +31,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',                      # Or path to database file if using sqlite3.
-        # The following settings are not used with sqlite3:
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
+        'ENGINE': 'django.db.backends.{0}'.format(config.get("database:engine", "sqlite3")),
+        'NAME': config.get("database:name", "sanume.db"),
+        'USER': config.get("database:user", ""),
+        'PASSWORD': config.get("database:password", ""),
+        'HOST': config.get("database:host", ""),
+        'PORT': config.get("database:port", ""),
     }
 }
 
@@ -83,7 +102,10 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 's_v!0n&5s_8(r))jp!dot6c9gdj)@e-@i4*^t(us95fd0$7k08'
+SECRET_KEY = config.get("vewngyu:salt", "")
+
+if not SECRET_KEY:
+    raise Exception("You need make a salt and put it in the vewngyu section under 'salt'")
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -124,6 +146,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    "vewngyu",
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
